@@ -1,0 +1,181 @@
+%-------------------------
+% Manas Pathak Resume
+% Compile with pdflatex in TeXworks
+%-------------------------
+
+\documentclass[letterpaper,11pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\usepackage{geometry}
+
+\geometry{
+  top=0.5in,
+  bottom=0.5in,
+  left=0.6in,
+  right=0.6in
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+% Section title formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large\bfseries
+}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+
+%---- Custom Commands ----
+
+\newcommand{\resumeItem}[1]{
+  \item\small{#1 \vspace{-2pt}}
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-2pt}\item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+  \item
+  \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+    \small#1 & #2 \\
+  \end{tabular*}\vspace{-7pt}
+}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
+\newcommand{\resumeItemListStart}{\begin{itemize}[leftmargin=0.2in]}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%===========================================
+\begin{document}
+%===========================================
+
+%---------- HEADING ----------
+\begin{center}
+    {\Huge \textbf{MANAS PATHAK}} \\[6pt]
+    \small
+    +91 9404911711 \quad $|$ \quad
+    \href{mailto:manaspathak1711@gmail.com}{\underline{manaspathak1711@gmail.com}} \quad $|$ \quad
+    \href{https://www.linkedin.com/in/pathak-manas/}{\underline{linkedin.com/in/pathak-manas}} \quad $|$ \quad
+    \href{https://github.com/Mapicx}{\underline{github.com/Mapicx}}
+\end{center}
+
+%---------- PROFESSIONAL SUMMARY ----------
+\section{Professional Summary}
+\small{
+\textbf{Computer Science Engineer} with hands-on experience in \textbf{Python, Java, SQL, machine learning, and AI/LLM systems}. Built production-grade platforms integrating \textbf{REST APIs, relational databases, and deep learning models}. Strong foundation in \textbf{data structures and algorithms, object-oriented programming, DBMS}, and \textbf{scalable backend architecture}. Experienced with \textbf{cloud deployment, version control}, and \textbf{blockchain smart contracts}.
+}
+
+\vspace{4pt}
+
+%---------- TECHNICAL SKILLS ----------
+\section{Technical Skills}
+\begin{itemize}[leftmargin=0.15in, label={}, itemsep=2pt]
+    \item \textbf{Languages:} Python, Java, C/C++, Solidity, SQL
+    \item \textbf{Data \& ML:} NumPy, Pandas, Scikit-learn, PyTorch, Feature Engineering, Data Cleaning, Transformers
+    \item \textbf{AI / NLP / LLM:} LangChain, LangGraph, RAG, Prompt Engineering, Embeddings, Multi-Agent Systems
+    \item \textbf{Backend \& Databases:} REST APIs, FastAPI, PostgreSQL, MySQL, SQLAlchemy (Async), Query Optimization
+    \item \textbf{Tools \& Cloud:} Git/GitHub, Linux, Docker, AWS, PyPI, Smart Contracts
+\end{itemize}
+
+%---------- PROJECT EXPERIENCE ----------
+\section{Project Experience}
+
+\resumeSubHeadingListStart
+
+  % ---- TimeForge ----
+  \resumeProjectHeading
+    {\href{https://github.com/Mapicx/TimeForge.git}{\underline{\textbf{TimeForge}}}
+     \ $-$ \ \textit{GNSS Clock Bias Prediction \& Analysis System}}{}
+  \resumeItemListStart
+    \resumeItem{Built a full-stack system to monitor, analyze, and predict \textbf{GNSS satellite clock bias and orbit errors} using time-series forecasting models.}
+    \resumeItem{Developed a \textbf{Transformer-based deep learning model} (PyTorch) with \textbf{satellite embeddings}, achieving high-precision prediction of clock corrections.}
+    \resumeItem{Implemented a React + Three.js \textbf{3D visualization dashboard} with an \textbf{AI agent} (LangChain + Gemini API) for natural-language satellite analytics.}
+  \resumeItemListEnd
+
+  \vspace{4pt}
+
+  % ---- Mapicx ----
+  \resumeProjectHeading
+    {\href{https://github.com/Mapicx/Mapicx_ANN.git}{\underline{\textbf{Mapicx}}}
+     \ $-$ \ \textit{Lightweight Deep Learning Framework}}{\ \small\textit{300+ downloads on PyPI}}
+  \resumeItemListStart
+    \resumeItem{Engineered a neural network framework from scratch in \textbf{Python and NumPy} with Dense, Dropout layers and \textbf{ReLU/Softmax} activations.}
+    \resumeItem{Developed an automatic differentiation system with gradient clipping and normalization, improving \textbf{training convergence by 15\%}.}
+    \resumeItem{Designed a \textbf{Keras-like API} (compile, fit, predict) and published the package on \textbf{PyPI}, accumulating 300+ downloads.}
+    \resumeItem{Achieved \textbf{96.7\% accuracy} on a spiral dataset benchmark, validating model correctness.}
+  \resumeItemListEnd
+
+  \vspace{4pt}
+
+  % ---- MapR1 ----
+  \resumeProjectHeading
+    {\href{https://github.com/Mapicx/MapR1.git}{\underline{\textbf{MapR1}}}
+     \ $-$ \ \textit{Autonomous Multi-Agent Dream Simulator Engine}}{}
+  \resumeItemListStart
+    \resumeItem{Architected a \textbf{multi-agent dream simulation engine} in Python where LLM-powered agents autonomously strategize, form alliances, and generate emergent scenarios from a single natural-language prompt.}
+    \resumeItem{Built a \textbf{Contextual Consequence Engine} that propagates causal impacts across agents, dynamically shifting trust scores, alliance stability, and world tension using non-linear weight scaling.}
+    \resumeItem{Implemented async database layer (\textbf{SQLAlchemy + Supabase PostgreSQL}) with a \textbf{Scenario Seeder} pipeline that auto-generates factions, economies, hidden knowledge, and goal conflicts from seed prompts.}
+    \resumeItem{Designed a \textbf{Dream Director} and \textbf{Story Compiler} that transforms raw simulation logs into chapter-by-chapter dream sequences with per-agent diary exports.}
+  \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+%---------- EDUCATION ----------
+\section{Education}
+\resumeSubHeadingListStart
+  \resumeSubheading
+    {JSPM's Rajarshi Shahu College of Engineering}{}
+    {Bachelor of Technology (B.Tech), Computer Science \textemdash\ \textbf{9.0 CGPA}}{}
+  \vspace{2pt}
+  \begin{itemize}[leftmargin=0.15in, label={}, itemsep=1pt]
+    \item \small Class 12 \textemdash\ \textbf{82.67\%}
+    \item \small Class 10 \textemdash\ \textbf{92.60\%}
+  \end{itemize}
+\resumeSubHeadingListEnd
+
+%---------- WORK EXPERIENCE ----------
+\section{Work Experience}
+\resumeSubHeadingListStart
+  \resumeSubheading
+    {Google Developer Group}{Jul 2025 -- Jun 2026}
+    {Technical Lead $|$ Blockchain Team}{}
+  \resumeItemListStart
+    \resumeItem{\textbf{System Design \& Optimization:} Architected an ERC-721-compliant digital marketplace with wallet integration and cost optimization algorithms, reducing per-transaction overhead by 30\%.}
+    \resumeItem{\textbf{Team Leadership:} Led a cross-functional team to ship two end-to-end platforms (token system + marketplace), coordinating design, development, and campus-wide rollout.}
+  \resumeItemListEnd
+\resumeSubHeadingListEnd
+
+%---------- ACHIEVEMENTS ----------
+\section{Achievements}
+\begin{itemize}[leftmargin=0.2in, itemsep=4pt]
+  \item \textbf{Finalist --- Smart India Hackathon (SIH):} Built a \textbf{policy intelligence platform} using \textbf{RAG, pgvector, FastAPI, and role-based access control}, recognized nationally for scalable document intelligence and compliance automation.
+
+  \item \textbf{Open Source (PyPI):} Published \textbf{Mapicx}, a deep learning framework on \textbf{PyPI} with \textbf{300+ downloads} and a companion technical article, achieving \textbf{96.7\% benchmark accuracy} via optimized SGD training.
+
+  \item \textbf{DSA / Problem Solving:} Solved \textbf{250+ coding problems} across \textbf{LeetCode, GeeksforGeeks, and NeetCode}, strengthening fundamentals in data structures, algorithms, and competitive programming.
+\end{itemize}
+
+%===========================================
+\end{document}

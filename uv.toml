@@ -1,0 +1,6 @@
+# uv project-level config
+# Suppress hardlink warning (cache on different filesystem than .venv)
+link-mode = "copy"
+
+# PyTorch CUDA 11.8 index
+extra-index-url = ["https://download.pytorch.org/whl/cu118"]

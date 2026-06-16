@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MapR1 Dream Simulator - Universe View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-secondary": "#313030",
+                "inverse-surface": "#e5e2e1",
+                "surface-container-low": "#1c1b1b",
+                "on-tertiary-container": "#794418",
+                "on-error-container": "#ffdad6",
+                "surface-container": "#201f1f",
+                "on-primary-fixed": "#00210c",
+                "on-secondary-fixed": "#1c1b1b",
+                "on-surface": "#e5e2e1",
+                "primary-fixed": "#6dfe9c",
+                "on-primary-fixed-variant": "#005227",
+                "tertiary": "#ffd9c1",
+                "surface-bright": "#3a3939",
+                "primary-container": "#4ade80",
+                "secondary-fixed-dim": "#c8c6c5",
+                "primary-fixed-dim": "#4de082",
+                "surface-container-highest": "#353534",
+                "on-error": "#690005",
+                "surface": "#131313",
+                "tertiary-fixed": "#ffdcc6",
+                "tertiary-container": "#ffb47f",
+                "on-secondary-fixed-variant": "#474746",
+                "secondary-fixed": "#e5e2e1",
+                "secondary": "#c8c6c5",
+                "secondary-container": "#474746",
+                "inverse-primary": "#006d36",
+                "background": "#131313",
+                "outline": "#869486",
+                "on-primary": "#003919",
+                "on-tertiary-fixed": "#301400",
+                "primary": "#6bfb9a",
+                "on-tertiary-fixed-variant": "#6c3a0f",
+                "surface-tint": "#4de082",
+                "surface-dim": "#131313",
+                "on-surface-variant": "#bccabb",
+                "tertiary-fixed-dim": "#ffb784",
+                "outline-variant": "#3d4a3e",
+                "surface-container-high": "#2a2a2a",
+                "on-primary-container": "#005e2d",
+                "surface-variant": "#353534",
+                "inverse-on-surface": "#313030",
+                "error": "#ffb4ab",
+                "surface-container-lowest": "#0e0e0e",
+                "on-tertiary": "#4f2500",
+                "error-container": "#93000a",
+                "on-background": "#e5e2e1",
+                "on-secondary-container": "#b7b5b4"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "margin-desktop": "32px",
+                "margin-mobile": "16px",
+                "container-max-width": "1280px",
+                "gutter": "16px",
+                "unit": "4px"
+        },
+        "fontFamily": {
+                "body-md": [
+                        "Inter"
+                ],
+                "label-mono-sm": [
+                        "JetBrains Mono"
+                ],
+                "label-mono-lg": [
+                        "JetBrains Mono"
+                ],
+                "headline-xl": [
+                        "Inter"
+                ],
+                "headline-lg": [
+                        "Inter"
+                ],
+                "headline-lg-mobile": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-mono-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.1em",
+                                "fontWeight": "500"
+                        }
+                ],
+                "label-mono-lg": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "500"
+                        }
+                ],
+                "headline-xl": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        /* Glassmorphism utils not fully covered by tailwind */
+        .glass-panel {
+            background-color: rgba(19, 19, 19, 0.85); /* Deep charcoal */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(107, 251, 154, 0.4); /* Neon green border */
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Scanline Texture */
+        .glass-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(107, 251, 154, 0),
+                rgba(107, 251, 154, 0) 50%,
+                rgba(107, 251, 154, 0.05) 50%,
+                rgba(107, 251, 154, 0.05)
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .glass-panel-active {
+            background-color: rgba(19, 19, 19, 0.95);
+            border-color: rgba(107, 251, 154, 0.8);
+            box-shadow: 0 0 20px rgba(107, 251, 154, 0.3); /* Neon green glow */
+        }
+        
+        /* Custom scrollbar for data logs */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(107, 251, 154, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(107, 251, 154, 0.6);
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            background-color: #131313;
+        }
+
+        /* Sidebar Interactive Grid Effect */
+        .grid-interactive {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(107, 251, 154, 0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(107, 251, 154, 0.2) 1px, transparent 1px);
+            background-size: var(--grid-size, 20px) var(--grid-size, 20px);
+            background-position: center;
+            transition: background-size 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            mask-image: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 60%);
+            -webkit-mask-image: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 60%);
+            opacity: 0.5;
+            animation: gridFlicker 4s infinite alternate;
+        }
+
+        @keyframes gridFlicker {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.6; }
+            25%, 75% { opacity: 0.5; }
+        }
+
+        #left-sidebar:hover .grid-interactive {
+             --grid-size: 28px; /* Expand grid on hover */
+             opacity: 1;
+             animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
+        }
+
+        @keyframes glitch {
+          0% { transform: translate(0) }
+          20% { transform: translate(-2px, 2px) }
+          40% { transform: translate(-2px, -2px) }
+          60% { transform: translate(2px, 2px) }
+          80% { transform: translate(2px, -2px) }
+          100% { transform: translate(0) }
+        }
+
+        /* Nebula Overlay */
+        .nebula-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            background: radial-gradient(circle at 50% 50%, rgba(107, 251, 154, 0.05), transparent 70%);
+            animation: nebulaRotate 60s linear infinite;
+        }
+
+        @keyframes nebulaRotate {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        /* Scanning Line */
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(107, 251, 154, 0.8);
+            box-shadow: 0 0 10px rgba(107, 251, 154, 1);
+            animation: scan 4s linear infinite;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        @keyframes scan {
+            0% { top: -5%; opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { top: 105%; opacity: 0; }
+        }
+
+        /* Ticker Animation */
+        .ticker-wrap {
+            width: 100%;
+            overflow: hidden;
+            box-sizing: content-box;
+        }
+
+        .ticker {
+            display: inline-block;
+            white-space: nowrap;
+            padding-right: 100%;
+            box-sizing: content-box;
+            animation: ticker 20s linear infinite;
+        }
+
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        /* Entrance Animations */
+        .fade-slide-in {
+            animation: fadeSlideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+
+        @keyframes fadeSlideIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Chromatic Aberration Container */
+        .chromatic-aberration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            box-shadow: inset 0 0 150px rgba(255, 0, 0, 0), inset 0 0 150px rgba(0, 255, 0, 0), inset 0 0 150px rgba(0, 0, 255, 0);
+            transition: box-shadow 0.5s ease;
+        }
+        
+        body.sim-active .chromatic-aberration {
+             animation: chromaticPulse 3s infinite alternate;
+        }
+
+        @keyframes chromaticPulse {
+            0% { box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.1), inset 0 0 50px rgba(0, 255, 0, 0.1), inset 0 0 50px rgba(0, 0, 255, 0.1); }
+            50% { box-shadow: inset 0 0 80px rgba(255, 0, 0, 0.2), inset 0 0 80px rgba(0, 255, 0, 0.05), inset 0 0 80px rgba(0, 0, 255, 0.2); }
+            100% { box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.1), inset 0 0 50px rgba(0, 255, 0, 0.1), inset 0 0 50px rgba(0, 0, 255, 0.1); }
+        }
+
+        /* Logo Pulse */
+        .logo-pulse {
+            animation: logoPulse 2s infinite alternate;
+        }
+
+        @keyframes logoPulse {
+            from { text-shadow: 0 0 5px rgba(107, 251, 154, 0.4); }
+            to { text-shadow: 0 0 15px rgba(107, 251, 154, 0.8), 0 0 25px rgba(107, 251, 154, 0.6); }
+        }
+
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen overflow-hidden selection:bg-primary-container selection:text-on-primary-container sim-active" id="parallax-body">
+<!-- Chromatic Aberration Layer -->
+<div class="chromatic-aberration"></div>
+<!-- Nebula Overlay -->
+<div class="nebula-overlay"></div>
+<!-- 3D Canvas Layer -->
+<div id="canvas-container"></div>
+<!-- UI Overlay (Level 2 & 3) -->
+<div class="relative z-10 w-full h-full pointer-events-none">
+<!-- TopNavBar (Web Only) -->
+<header class="hidden md:flex fixed top-0 left-0 w-full z-50 justify-between items-center px-gutter h-16 bg-surface/80 backdrop-blur-xl border-b border-primary/30 shadow-[0_0_20px_rgba(107,251,154,0.15)] pointer-events-auto transition-all duration-150 fade-slide-in">
+<div class="flex items-center gap-6">
+<span class="font-headline-lg text-headline-lg tracking-tighter text-primary drop-shadow-[0_0_8px_rgba(107,251,154,0.5)] logo-pulse">MapR1</span>
+<nav class="flex gap-1 ml-4">
+<button class="px-4 py-2 font-label-mono-lg text-label-mono-lg text-primary font-bold border-b-2 border-primary pb-1">Scenarios</button>
+<button class="px-4 py-2 font-label-mono-lg text-label-mono-lg text-primary/70 font-medium hover:text-primary hover:bg-primary/10 transition-all rounded-DEFAULT">Entities</button>
+<button class="px-4 py-2 font-label-mono-lg text-label-mono-lg text-primary/70 font-medium hover:text-primary hover:bg-primary/10 transition-all rounded-DEFAULT">Agents</button>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex bg-surface-variant/50 rounded-lg p-1 border border-primary/30">
+<button class="p-2 text-primary/70 hover:text-primary hover:bg-primary/20 rounded-DEFAULT transition-all"><span class="material-symbols-outlined text-[20px]">play_arrow</span></button>
+<button class="p-2 text-primary/70 hover:text-primary hover:bg-primary/20 rounded-DEFAULT transition-all"><span class="material-symbols-outlined text-[20px]">pause</span></button>
+<button class="p-2 text-primary/70 hover:text-primary hover:bg-primary/20 rounded-DEFAULT transition-all"><span class="material-symbols-outlined text-[20px]">step_over</span></button>
+<button class="p-2 text-primary/70 hover:text-primary hover:bg-primary/20 rounded-DEFAULT transition-all"><span class="material-symbols-outlined text-[20px]">stop</span></button>
+</div>
+<button class="flex items-center gap-2 bg-primary/20 text-primary px-4 py-2 rounded-DEFAULT font-label-mono-lg text-label-mono-lg hover:bg-primary/40 hover:shadow-[0_0_15px_rgba(107,251,154,0.4)] transition-all border border-primary/50">
+                    Execute Sim
+                </button>
+</div>
+</header>
+<!-- Main Layout Wrapper -->
+<div class="flex h-screen pt-16 pb-20 md:pb-0 pointer-events-none">
+<!-- SideNavBar (Left) -->
+<aside class="hidden md:flex flex-col fixed left-0 top-16 bottom-20 w-64 z-40 bg-background/60 backdrop-blur-2xl border-r border-primary/30 pointer-events-auto transition-all duration-300 ease-in-out relative fade-slide-in delay-1" id="left-sidebar">
+<div class="grid-interactive"></div>
+<div class="p-6 border-b border-primary/30 relative z-10">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center border border-primary/50 text-primary shadow-[0_0_10px_rgba(107,251,154,0.3)]">
+<span class="material-symbols-outlined">account_circle</span>
+</div>
+<div>
+<h2 class="font-headline-lg text-[16px] text-primary">Simulation Core</h2>
+<p class="font-label-mono-sm text-label-mono-sm text-primary/70">MapR1 Engine v4.2</p>
+</div>
+</div>
+<button class="w-full py-2 bg-primary/10 text-primary border border-primary/50 rounded-DEFAULT font-label-mono-lg text-label-mono-lg hover:bg-primary/20 transition-all hover:shadow-[0_0_10px_rgba(107,251,154,0.2)] flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span> New Node
+                    </button>
+</div>
+<nav class="flex-1 overflow-y-auto py-4 relative z-10">
+<div class="px-3 space-y-1 mb-8">
+<p class="px-4 text-xs font-label-mono-sm text-primary/50 uppercase mb-2">Navigation</p>
+<button class="w-full flex items-center gap-3 px-4 py-3 bg-primary/20 text-primary border-r-2 border-primary font-label-mono-lg text-label-mono-lg text-left shadow-[inset_0_0_10px_rgba(107,251,154,0.1)]">
+<span class="material-symbols-outlined text-[20px]">account_tree</span>
+                            Scenarios
+                        </button>
+<button class="w-full flex items-center gap-3 px-4 py-3 text-primary/70 hover:bg-primary/10 hover:text-primary font-label-mono-lg text-label-mono-lg text-left transition-all">
+<span class="material-symbols-outlined text-[20px]">category</span>
+                            Entities
+                        </button>
+<button class="w-full flex items-center gap-3 px-4 py-3 text-primary/70 hover:bg-primary/10 hover:text-primary font-label-mono-lg text-label-mono-lg text-left transition-all">
+<span class="material-symbols-outlined text-[20px]">psychology</span>
+                            Agents
+                        </button>
+</div>
+<!-- Scenario List Specific to View -->
+<div class="px-3 space-y-2">
+<p class="px-4 text-xs font-label-mono-sm text-primary/50 uppercase mb-2">Active Nodes</p>
+<div class="glass-panel p-3 mx-2 rounded-lg cursor-pointer hover:bg-primary/20 transition-all border-l-2 border-l-primary hover:shadow-[0_0_15px_rgba(107,251,154,0.2)]">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-md text-[14px] text-primary font-semibold">AGI Cooperation Era</h3>
+<span class="font-label-mono-lg text-primary animate-pulse">72%</span>
+</div>
+<p class="font-label-mono-sm text-[10px] text-primary/60">Idx: #00A1 | Emerald</p>
+</div>
+<div class="glass-panel p-3 mx-2 rounded-lg cursor-pointer hover:bg-primary/20 transition-all border-l-2 border-l-[#ff1744] hover:shadow-[0_0_15px_rgba(255,23,68,0.2)]">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-md text-[14px] text-[#ff1744] font-semibold">Fragmented Digital Nations</h3>
+<span class="font-label-mono-lg text-[#ff1744]">45%</span>
+</div>
+<p class="font-label-mono-sm text-[10px] text-[#ff1744]/60">Idx: #00F4 | Crimson</p>
+</div>
+<div class="glass-panel p-3 mx-2 rounded-lg cursor-pointer hover:bg-primary/20 transition-all border-l-2 border-l-[#7c4dff] hover:shadow-[0_0_15px_rgba(124,77,255,0.2)]">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-body-md text-[14px] text-[#7c4dff] font-semibold">Hybrid Governance</h3>
+<span class="font-label-mono-lg text-[#7c4dff]">61%</span>
+</div>
+<p class="font-label-mono-sm text-[10px] text-[#7c4dff]/60">Idx: #00H8 | Royal</p>
+</div>
+</div>
+</nav>
+<div class="p-4 border-t border-primary/30 space-y-1 relative z-10">
+<button class="w-full flex items-center gap-3 px-4 py-2 text-primary/70 hover:bg-primary/10 hover:text-primary font-label-mono-lg text-label-mono-lg text-left transition-all rounded-DEFAULT">
+<span class="material-symbols-outlined text-[18px]">settings</span> Settings
+                    </button>
+<button class="w-full flex items-center gap-3 px-4 py-2 text-primary/70 hover:bg-primary/10 hover:text-primary font-label-mono-lg text-label-mono-lg text-left transition-all rounded-DEFAULT">
+<span class="material-symbols-outlined text-[18px]">terminal</span> Logs
+                    </button>
+</div>
+</aside>
+<!-- Center Canvas Area (Transparent to show 3D) -->
+<main class="flex-1 ml-0 md:ml-64 relative">
+<!-- HUD Overlays -->
+<div class="absolute top-margin-desktop right-margin-desktop pointer-events-auto flex flex-col gap-2 items-end fade-slide-in delay-2">
+<div class="glass-panel px-3 py-1 rounded-full flex items-center gap-2 border-primary/50 shadow-[0_0_10px_rgba(107,251,154,0.2)]">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(107,251,154,1)]"></div>
+<span class="font-label-mono-sm text-label-mono-sm text-primary">DEMO MODE</span>
+</div>
+<div class="glass-panel px-3 py-1 rounded-full flex items-center gap-2 border-primary/50 shadow-[0_0_10px_rgba(107,251,154,0.2)]">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(107,251,154,1)]"></div>
+<span class="font-label-mono-sm text-label-mono-sm text-primary">TACTICAL GRID: ACTIVE</span>
+</div>
+</div>
+<!-- Right Sidebar HUD Panels -->
+<div class="absolute top-margin-desktop right-margin-desktop mt-20 w-72 space-y-panel-gap pointer-events-auto hidden lg:block fade-slide-in delay-3">
+<!-- Node Details Panel -->
+<div class="glass-panel rounded-xl p-5 min-h-[150px] flex flex-col justify-center items-center text-center border-t border-t-primary/50 relative">
+<div class="scan-line"></div>
+<span class="material-symbols-outlined text-primary/70 text-[32px] mb-2 drop-shadow-[0_0_5px_rgba(107,251,154,0.5)]">travel_explore</span>
+<p class="font-label-mono-lg text-primary/90">Click any node to explore</p>
+<p class="font-label-mono-sm text-[10px] text-primary/60 mt-2 animate-pulse">Awaiting target lock...</p>
+</div>
+<!-- Emergent Patterns Panel -->
+<div class="glass-panel rounded-xl p-5 border-t border-t-primary/50 relative">
+<div class="scan-line" style="animation-delay: 2s;"></div>
+<div class="flex justify-between items-center mb-4 border-b border-primary/30 pb-2">
+<h3 class="font-label-mono-lg text-label-mono-lg text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">troubleshoot</span>
+                                Emergent Patterns
+                            </h3>
+<span class="font-label-mono-sm text-primary/70">0 detected</span>
+</div>
+<div class="py-6 flex justify-center">
+<div class="w-12 h-12 rounded-full border-2 border-dashed border-primary/60 animate-[spin_10s_linear_infinite] flex items-center justify-center shadow-[0_0_15px_rgba(107,251,154,0.2)]">
+<div class="w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_rgba(107,251,154,1)]"></div>
+</div>
+</div>
+<p class="text-center font-label-mono-sm text-primary/60 text-[10px]">Scanning simulation manifold...</p>
+</div>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Mobile/Universal Data Log) -->
+<div class="fixed bottom-0 left-0 w-full z-50 pointer-events-auto fade-slide-in delay-2">
+<!-- Data Log Tick (Above nav) -->
+<div class="hidden md:block w-full h-8 bg-surface/90 backdrop-blur-md border-t border-primary/40 px-4 py-1 overflow-hidden font-label-mono-sm text-label-mono-sm text-primary/80 flex items-center gap-4 glass-panel !border-l-0 !border-r-0 !border-b-0">
+<span class="text-primary animate-pulse font-bold drop-shadow-[0_0_5px_rgba(107,251,154,0.8)] z-10 bg-surface/90 pr-2">● LIVE</span>
+<div class="flex-1 ticker-wrap">
+<div class="ticker">
+<span class="text-primary/60 mr-2">14:02:45.33</span>
+<span class="text-primary font-bold">[STEP 12]</span> NeuralDyne → Trade → Open Future
+                        <span class="text-primary/40 mx-4">|</span>
+<span class="text-primary/60 mr-2">14:02:45.21</span>
+<span class="text-primary font-bold">[NODE]</span> Adjusting probability matrix for Fragmented Digital Nations (+0.2%)
+                        <span class="text-primary/40 mx-4">|</span>
+<span class="text-primary/60 mr-2">14:02:45.10</span>
+<span class="text-primary font-bold">[SYSTEM]</span> Agent manifold realignment completed.
+                        <span class="text-primary/40 mx-4">|</span>
+<span class="text-primary/60 mr-2">14:02:44.95</span>
+<span class="text-primary font-bold">[WARN]</span> Detected emergent cooperation in cluster #00A1.
+                    </div>
+</div>
+</div>
+<!-- Mobile Nav Shell -->
+<nav class="md:hidden flex justify-around items-center h-20 px-4 pb-safe bg-surface/90 backdrop-blur-2xl border-t border-primary/40 shadow-[0_-4px_24px_rgba(107,251,154,0.15)] glass-panel !border-l-0 !border-r-0 !border-b-0">
+<button class="flex flex-col items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 transition-colors p-2 rounded-lg">
+<span class="material-symbols-outlined mb-1">rebase_edit</span>
+<span class="font-label-mono-sm text-[10px]">Timeline</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary/20 text-primary border border-primary/50 shadow-[0_0_10px_rgba(107,251,154,0.2)] rounded-xl px-6 py-1">
+<span class="material-symbols-outlined mb-1">segment</span>
+<span class="font-label-mono-sm text-[10px]">Logs</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 transition-colors p-2 rounded-lg">
+<span class="material-symbols-outlined mb-1">language</span>
+<span class="font-label-mono-sm text-[10px]">World State</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary/60 hover:text-primary hover:bg-primary/10 transition-colors p-2 rounded-lg">
+<span class="material-symbols-outlined mb-1">query_stats</span>
+<span class="font-label-mono-sm text-[10px]">Diagnostics</span>
+</button>
+</nav>
+</div>
+</div>
+<script>
+        // --- Parallax Mouse Tracking Setup ---
+        const body = document.getElementById('parallax-body');
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth / 2);
+            mouseY = (e.clientY - window.innerHeight / 2);
+        });
+
+        // --- Sidebar Mouse Tracking Setup ---
+        const sidebar = document.getElementById('left-sidebar');
+        if (sidebar) {
+            sidebar.addEventListener('mousemove', (e) => {
+                const rect = sidebar.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                sidebar.style.setProperty('--mouse-x', `${x}px`);
+                sidebar.style.setProperty('--mouse-y', `${y}px`);
+            });
+            sidebar.addEventListener('mouseleave', () => {
+                sidebar.style.setProperty('--mouse-x', `50%`);
+                sidebar.style.setProperty('--mouse-y', `50%`);
+            });
+        }
+
+        // --- Three.js Setup ---
+        const initThreeJS = () => {
+            const container = document.getElementById('canvas-container');
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x131313, 0.015);
+
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 8, 45);
+            const cameraGroup = new THREE.Group();
+            cameraGroup.add(camera);
+            scene.add(cameraGroup);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x112211, 2);
+            scene.add(ambientLight);
+            
+            const mainLight = new THREE.DirectionalLight(0x6bfb9a, 2);
+            mainLight.position.set(10, 20, 10);
+            scene.add(mainLight);
+
+            const pointLight = new THREE.PointLight(0x6bfb9a, 3, 100);
+            pointLight.position.set(0, 0, 0);
+            scene.add(pointLight);
+
+            // Tactical Grid Floor
+            const gridHelper = new THREE.GridHelper(200, 100, 0x6bfb9a, 0x113322);
+            gridHelper.position.y = -15;
+            gridHelper.material.opacity = 0.4;
+            gridHelper.material.transparent = true;
+            scene.add(gridHelper);
+
+            // Data-bits / Sparks Background
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particleCount = 2000;
+            const posArray = new Float32Array(particleCount * 3);
+            for(let i = 0; i < particleCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 150;
+            }
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            // Create a custom material for square, glowing data bits
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.15,
+                color: 0x6bfb9a,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+
+            // Tech-Infused Nodes
+            const createTechNode = (radius, position, baseColor = 0x052e16, emissiveColor = 0x166534, shellColor = 0x6bfb9a, orbitColor = 0x86efac, isSelected = false) => {
+                const group = new THREE.Group();
+                group.position.copy(position);
+
+                // Core Sphere
+                const coreGeo = new THREE.SphereGeometry(radius * 0.9, 32, 32);
+                const coreMat = new THREE.MeshPhongMaterial({
+                    color: baseColor, // Custom base color
+                    emissive: emissiveColor, // Custom glow color
+                    emissiveIntensity: 0.8,
+                    transparent: true,
+                    opacity: 0.9,
+                    wireframe: false
+                });
+                const core = new THREE.Mesh(coreGeo, coreMat);
+                group.add(core);
+
+                // Wireframe Shell
+                const shellGeo = new THREE.IcosahedronGeometry(radius, 2);
+                const shellMat = new THREE.MeshBasicMaterial({
+                    color: shellColor,
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.4,
+                    blending: THREE.AdditiveBlending
+                });
+                const shell = new THREE.Mesh(shellGeo, shellMat);
+                group.add(shell);
+
+                // Orbiting Data Points (mini particles around node)
+                const orbitGeo = new THREE.BufferGeometry();
+                const orbitCount = 100;
+                const orbitPos = new Float32Array(orbitCount * 3);
+                for(let i = 0; i < orbitCount * 3; i += 3) {
+                    const r = radius * 1.2;
+                    const theta = Math.random() * Math.PI * 2;
+                    const phi = Math.acos((Math.random() * 2) - 1);
+                    orbitPos[i] = r * Math.sin(phi) * Math.cos(theta);
+                    orbitPos[i+1] = r * Math.sin(phi) * Math.sin(theta);
+                    orbitPos[i+2] = r * Math.cos(phi);
+                }
+                orbitGeo.setAttribute('position', new THREE.BufferAttribute(orbitPos, 3));
+                const orbitMat = new THREE.PointsMaterial({
+                    size: 0.1,
+                    color: orbitColor,
+                    transparent: true,
+                    opacity: 0.6,
+                    blending: THREE.AdditiveBlending
+                });
+                const orbitParticles = new THREE.Points(orbitGeo, orbitMat);
+                group.add(orbitParticles);
+                
+                // Add Orbital Ring for Selected Node
+                let ring = null;
+                if(isSelected) {
+                    const ringGeo = new THREE.RingGeometry(radius * 1.4, radius * 1.45, 64);
+                    const ringMat = new THREE.MeshBasicMaterial({
+                        color: orbitColor,
+                        side: THREE.DoubleSide,
+                        transparent: true,
+                        opacity: 0.5,
+                        blending: THREE.AdditiveBlending
+                    });
+                    ring = new THREE.Mesh(ringGeo, ringMat);
+                    ring.rotation.x = Math.PI / 2;
+                    group.add(ring);
+                }
+
+                scene.add(group);
+                return { group, core, shell, orbitParticles, ring };
+            };
+
+            const nodes = [
+                createTechNode(6, new THREE.Vector3(-18, 5, -5), 0x004d40, 0x00bfa5, 0x1de9b6, 0x6bfb9a, true), // Node 1: AGI Cooperation Era (Emerald/Cyan) - SELECTED
+                createTechNode(4.5, new THREE.Vector3(12, -2, 8), 0x4a0000, 0xb71c1c, 0xff1744, 0xff8a80), // Node 2: Fragmented Digital Nations (Crimson/Red)
+                createTechNode(5, new THREE.Vector3(8, 14, -12), 0x1a0033, 0x4a148c, 0x7c4dff, 0xb388ff), // Node 3: Hybrid Governance (Royal Purple/Blue)
+                createTechNode(3.5, new THREE.Vector3(-8, -10, -15)),
+                createTechNode(4, new THREE.Vector3(22, 6, -8))
+            ];
+
+            // Connecting Lines (Tactical Green) & Particle Streams
+            const connections = [];
+            const streamParticles = [];
+            
+            const createConnection = (p1, p2) => {
+                const points = [];
+                points.push(p1);
+                // add slight curve
+                const mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+                mid.y += (Math.random() * 4 - 2); 
+                mid.x += (Math.random() * 4 - 2);
+                points.push(mid);
+                points.push(p2);
+
+                const curve = new THREE.QuadraticBezierCurve3(points[0], points[1], points[2]);
+                const tubeGeom = new THREE.TubeGeometry(curve, 30, 0.08, 6, false);
+                const mat = new THREE.MeshBasicMaterial({ 
+                    color: 0x6bfb9a, 
+                    transparent: true, 
+                    opacity: 0.5,
+                    blending: THREE.AdditiveBlending
+                });
+                
+                const tube = new THREE.Mesh(tubeGeom, mat);
+                scene.add(tube);
+                
+                // Create Data Stream Particles for this connection
+                const streamGeo = new THREE.BufferGeometry();
+                const streamCount = 20;
+                const streamPos = new Float32Array(streamCount * 3);
+                // Store progress along curve for each particle (0 to 1)
+                const streamProgress = new Float32Array(streamCount);
+                
+                for(let i = 0; i < streamCount; i++) {
+                    streamProgress[i] = Math.random();
+                }
+                streamGeo.setAttribute('position', new THREE.BufferAttribute(streamPos, 3));
+                
+                const streamMat = new THREE.PointsMaterial({
+                    size: 0.3,
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.8,
+                    blending: THREE.AdditiveBlending
+                });
+                
+                const streamPoints = new THREE.Points(streamGeo, streamMat);
+                scene.add(streamPoints);
+                
+                streamParticles.push({
+                    mesh: streamPoints,
+                    curve: curve,
+                    progress: streamProgress,
+                    count: streamCount
+                });
+
+                return tube;
+            };
+
+            // Connect nodes in a web
+            createConnection(nodes[0].group.position, nodes[1].group.position);
+            createConnection(nodes[1].group.position, nodes[2].group.position);
+            createConnection(nodes[2].group.position, nodes[0].group.position);
+            createConnection(nodes[0].group.position, nodes[3].group.position);
+            createConnection(nodes[1].group.position, nodes[4].group.position);
+            createConnection(nodes[2].group.position, nodes[4].group.position);
+            createConnection(nodes[3].group.position, nodes[1].group.position);
+
+
+            // Animation Loop
+            let time = 0;
+            const animate = () => {
+                requestAnimationFrame(animate);
+                time += 0.01;
+                
+                // Parallax Camera Effect
+                targetX = mouseX * 0.02;
+                targetY = mouseY * 0.02;
+                cameraGroup.position.x += (targetX - cameraGroup.position.x) * 0.05;
+                cameraGroup.position.y += (-targetY - cameraGroup.position.y) * 0.05;
+
+                // Animate background particles (data-bits flowing upwards/sideways)
+                particlesMesh.rotation.y = time * 0.05;
+                particlesMesh.position.y = Math.sin(time * 0.2) * 2;
+                
+                // Animate Stream Particles
+                streamParticles.forEach(stream => {
+                    const positions = stream.mesh.geometry.attributes.position.array;
+                    for(let i=0; i < stream.count; i++) {
+                        stream.progress[i] += 0.005;
+                        if(stream.progress[i] > 1) stream.progress[i] = 0;
+                        
+                        const point = stream.curve.getPointAt(stream.progress[i]);
+                        positions[i*3] = point.x;
+                        positions[i*3+1] = point.y;
+                        positions[i*3+2] = point.z;
+                    }
+                    stream.mesh.geometry.attributes.position.needsUpdate = true;
+                });
+
+                // Animate nodes
+                nodes.forEach((nodeData, index) => {
+                    const { group, core, shell, orbitParticles, ring } = nodeData;
+                    
+                    // Rotate entire group slowly
+                    group.rotation.y += 0.002 * (index % 2 === 0 ? 1 : -1);
+                    group.rotation.x += 0.001;
+                    
+                    // Counter-rotate shell
+                    shell.rotation.y -= 0.005;
+                    shell.rotation.z += 0.003;
+                    
+                    // Rotate orbiting particles
+                    orbitParticles.rotation.y += 0.01;
+                    orbitParticles.rotation.x += 0.005;
+                    
+                    if(ring) {
+                        ring.rotation.z -= 0.01;
+                        // wobble
+                        ring.rotation.x = Math.PI / 2 + Math.sin(time * 2) * 0.1;
+                    }
+
+                    // Heartbeat Pulse core emissive intensity
+                    const pulse = Math.sin(time * 5 + index) * Math.sin(time * 5 + index); // sharper peak
+                    core.material.emissiveIntensity = 0.4 + pulse * 0.6;
+                    
+                    // Slight floating motion
+                    group.position.y += Math.sin(time * 2 + index) * 0.02;
+                });
+
+                // Move grid slightly for motion effect
+                gridHelper.position.z = (time * 2) % 10;
+
+                // Slow scene rotation
+                scene.rotation.y = Math.sin(time * 0.1) * 0.05;
+
+                renderer.render(scene, camera);
+            };
+
+            animate();
+
+            // Resize handler
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        };
+
+        // Initialize Three.js when DOM is ready
+        document.addEventListener('DOMContentLoaded', initThreeJS);
+    </script>
+</body></html>
